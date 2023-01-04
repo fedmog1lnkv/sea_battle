@@ -2,14 +2,14 @@
 
 #include "Field.h"
 
+
 Field::Field() { fill_map(); }
 
+#define FOR_MAP for(int i=0;i<10; i++) for (int j=0; j<10; j++)
+
 void Field::fill_map() {
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            board[i][j] = Cell();
-        }
-    }
+    FOR_MAP 
+        board[i][j] = Cell();
 }
 
 coordinate Field::get_coords_x_y(string coords) {
@@ -214,7 +214,7 @@ void Field::auto_placement_ships() {
 void Field::put_ship(int first_x, int first_y, int second_x, int second_y) {
     for (int x = first_x; x <= second_x; x++) {
         for (int y = first_y; y <= second_y; y++) {
-            board[y][x].status = 1;
+            board[y][x].status = CSt::ship_cell;
         }
     }
 }
@@ -232,11 +232,11 @@ void Field::mark_destroyed_ship(int x_coord, int y_coord, string coord = "") {
                 (x == x_coord && y == y_coord)) {
                 continue;
             }
-            if (board[y][x].status == 0) {
-                board[y][x].status = 4;
+            if (board[y][x].status == CSt::empty_cell) {
+                board[y][x].status = CSt::miss_cell;
             }
-            if (board[y][x].status == 2) {
-                board[y][x].status = 3;
+            if (board[y][x].status == CSt::damaged_ship) {
+                board[y][x].status = CSt::destroyed_ship;
                 mark_destroyed_ship(x, y);
             }
         }
@@ -251,20 +251,20 @@ int Field::make_attack(string coords) {
     // cout << cell_coord.x << " " << cell_coord.y << endl;
 
     // если в клеточке уже что-то происходило
-    if (board[cell_coord.y][cell_coord.x].status == 2 ||
-        board[cell_coord.y][cell_coord.x].status == 3 ||
-        board[cell_coord.y][cell_coord.x].status == 4) {
+    if (board[cell_coord.y][cell_coord.x].status == CSt::damaged_ship ||
+        board[cell_coord.y][cell_coord.x].status == CSt::destroyed_ship ||
+        board[cell_coord.y][cell_coord.x].status == CSt::miss_cell) {
         return 3;
     }
 
     // если в клеточке ничего нет
-    if (board[cell_coord.y][cell_coord.x].status == 0) {
-        board[cell_coord.y][cell_coord.x].status = 4;
+    if (board[cell_coord.y][cell_coord.x].status == CSt::empty_cell) {
+        board[cell_coord.y][cell_coord.x].status = CSt::miss_cell;
         return 0;
     }
 
     // если в клеточке корабль
-    if (board[cell_coord.y][cell_coord.x].status == 1) {
+    if (board[cell_coord.y][cell_coord.x].status == CSt::ship_cell) {
         // проверка есть ли у корабля продолжение
         bool ind_ship_nearby = false;
         for (int x = cell_coord.x - 1; x <= cell_coord.x + 1; x++) {
@@ -273,19 +273,19 @@ int Field::make_attack(string coords) {
                     (cell_coord.x == x && cell_coord.y == y)) {
                     continue;
                 }
-                if (board[y][x].status == 1) {
+                if (board[y][x].status == CSt::ship_cell) {
                     ind_ship_nearby = true;
                 }
             }
         }
         // ранил
         if (ind_ship_nearby == true) {
-            board[cell_coord.y][cell_coord.x].status = 2;
+            board[cell_coord.y][cell_coord.x].status = CSt::damaged_ship;
             return 1;
         }
         // убил
         else {
-            board[cell_coord.y][cell_coord.x].status = 3;
+            board[cell_coord.y][cell_coord.x].status = CSt::destroyed_ship;
             mark_destroyed_ship(cell_coord.x, cell_coord.y);
             return 2;
         }
@@ -293,7 +293,7 @@ int Field::make_attack(string coords) {
     return -1;
 }
 
-void Field::change_cell_radar(string coords, int new_status) {
+void Field::change_cell_radar(string coords, CSt new_status) {
     coordinate cell_coord = get_coords_x_y(coords);
     board[cell_coord.y][cell_coord.x].status = new_status;
 }

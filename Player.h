@@ -9,9 +9,8 @@ class Player {
 public:
     string name;
 
-    // 0 - не бот
-    // 1 - бот
-    int is_bot = 0;
+    bool is_bot = false;
+
     int count_ships = 10;
 
     Field map;

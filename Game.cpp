@@ -45,9 +45,6 @@ void Game::start_preparation() {
 
     type_placement_ships();
 
-    current_player.map.show_field();
-    current_player.map.show_field();
-
     status_switch();
 
     return;

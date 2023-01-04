@@ -1,30 +1,31 @@
 #include "Cell.h"
 
-Cell::Cell() { status = 0; }
+using CSt = Cell::Status;
+
+Cell::Cell() : status(CSt::empty_cell) {}
 
 bool Cell::is_busy() {
-    if (status != 0) {
-        return true;
-    }
-    return false;
+    return status != CSt::empty_cell;
 }
 
 ostream& operator<<(ostream& out, const Cell& status_cell) {
     switch (status_cell.status) {
-    case 0:
+    case CSt::empty_cell:
         out << status_cell.empty_cell;
         break;
-    case 1:
+    case CSt::ship_cell:
         out << status_cell.ship_cell;
         break;
-    case 2:
+    case CSt::damaged_ship:
         out << status_cell.damaged_ship;
         break;
-    case 3:
+    case CSt::destroyed_ship:
         out << status_cell.destroyed_ship;
         break;
-    case 4:
+    case CSt::miss_cell:
         out << status_cell.miss_cell;
+        break;
+    default:
         break;
     }
     return out;

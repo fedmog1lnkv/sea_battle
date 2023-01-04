@@ -14,13 +14,13 @@ int main() {
 
   /* string s = "B1:D1";
    cout << s.find("10");*/
-  /* Game game;
+  Game game;
 
-   game.start_preparation();*/
+   game.start_preparation();
 
-  Field f;
+  /*Field f;
   f.auto_placement_ships();
-  f.show_field();
+  f.show_field();*/
 
   return 0;
 }

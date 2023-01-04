@@ -8,6 +8,7 @@
 #include "Cell.h"
 
 using namespace std;
+using CSt = Cell::Status;
 
 constexpr int MAP_SIZE = 10;
 
@@ -51,7 +52,7 @@ public:
     // 3 - выстрел уже был
     int make_attack(string coords);
 
-    void change_cell_radar(string coords, int new_status);
+    void change_cell_radar(string coords, CSt new_status);
 
     void show_field();
 };
