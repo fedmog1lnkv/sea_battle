@@ -136,6 +136,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cell.h" />
+    <ClInclude Include="EnumClasses.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Field.h" />
     <ClInclude Include="Player.h" />

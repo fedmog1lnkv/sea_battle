@@ -1,18 +1,23 @@
 ﻿#pragma once
+#include <Windows.h>
+
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <map>
-#include <Windows.h>
 
 #include "Cell.h"
+#include "EnumClasses.h"
 #include "Ship.h"
 
+using CSt_t = CellStatus;
+using GS_t = GameStatus;
+using SA_t = StatusAttack;
+
 using namespace std;
-using CSt_t = Cell::Status;
 
 constexpr int MAP_SIZE = 10;
 
@@ -59,11 +64,7 @@ public:
         int second_y, int type_ship, bool is_player);
 
     // возвращает статус атаки
-    // 0 - мимо
-    // 1 - попал
-    // 2 - убил
-    // 3 - выстрел уже был
-    int make_attack(coordinate coords);
+    StatusAttack make_attack(coordinate coords);
 
     // возвращает сколько у корабля осталось hp
     int injure_ship(coordinate coord_ship);

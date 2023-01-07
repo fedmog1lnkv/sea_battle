@@ -1,25 +1,18 @@
 ﻿#include "Player.h"
 
-using CSt_t = Cell::Status;
+Player::Player() : count_ships(10) {}
 
-Player::Player() {}
-
-int Player::attack(Player& player_for_attack, coordinate coords) {
-
-    // 0 - мимо
-    // 1 - ранил
-    // 2 - убил
-    // 3 - уже использована
-    int status_attack = player_for_attack.map.make_attack(coords);
+StatusAttack Player::attack(Player& player_for_attack, coordinate coords) {
+    StatusAttack status_attack = player_for_attack.map.make_attack(coords);
 
     switch (status_attack) {
-    case 0:
+    case SA_t::miss:
         this->radar.change_cell_radar(coords, CSt_t::miss_cell);
         break;
-    case 1:
+    case SA_t::damage:
         this->radar.change_cell_radar(coords, CSt_t::damaged_ship);
         break;
-    case 2:
+    case SA_t::destroy:
         this->radar.mark_destroyed_ship_radar(coords.x, coords.y);
         player_for_attack.count_ships--;
     default:

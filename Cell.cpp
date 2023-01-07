@@ -1,8 +1,6 @@
 #include "Cell.h"
 
-using CSt_t = Cell::Status;
-
-Cell::Cell() : status(CSt_t::empty_cell) {}
+Cell::Cell() : status(CSt_t::empty_cell), weight(1) {}
 
 bool Cell::is_busy() { return status != CSt_t::empty_cell; }
 

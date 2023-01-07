@@ -1,9 +1,7 @@
 #include "Game.h"
 #include "windows.h"
 
-Game::Game() {
-    game_status = 0;
-}
+Game::Game() : game_status(GS_t::preparation) {}
 
 void Game::start_preparation() {
     system("cls");
@@ -46,11 +44,10 @@ void Game::start_preparation() {
         cout << "." << endl;
         Sleep(500);
     }
-    current_player.is_bot = true;
 
     cout << "Первый ходит: " << current_player.name << endl;
     Sleep(2000);
-    
+
     type_placement_ships();
 
     status_switch();
@@ -65,10 +62,11 @@ void Game::in_game() {
             current_player.radar.get_coord_max_weight_cell();
         string hint_move = current_player.map.get_coords_string(attack_cell);
 
-        int status_attack = current_player.attack(next_player, attack_cell);
+        StatusAttack status_attack =
+            current_player.attack(next_player, attack_cell);
         log(hint_move, status_attack);
 
-        if (status_attack == 0) {
+        if (status_attack == SA_t::miss) {
             swap(current_player, next_player);
         }
         cout << "Бот атакует: " << hint_move << endl;
@@ -96,11 +94,12 @@ void Game::in_game() {
 
         coordinate attack_cell =
             current_player.map.get_coords_x_y(coords_for_attack);
-        int status_attack = current_player.attack(next_player, attack_cell);
+        StatusAttack status_attack =
+            current_player.attack(next_player, attack_cell);
         log(coords_for_attack, status_attack);
 
         string d_status_attack = description_status_attack(status_attack);
-        if (status_attack == 0) {
+        if (status_attack == SA_t::miss) {
             cout << d_status_attack << endl;
             swap(current_player, next_player);
             Sleep(1000);
@@ -116,27 +115,27 @@ void Game::in_game() {
 
 void Game::end_game() {
     system("cls");
-    cout << current_player.name << " выйграл!" << endl;
+    cout << current_player.name << " выиграл!" << endl;
     current_player.map.show_field();
     next_player.map.show_field();
     return;
 }
 
 void Game::status_switch() {
-    if (game_status == 0) {
+    if (game_status == GS_t::preparation) {
         ofstream log_file("log_file.txt");
         log_file << "Лог игры\n";
         log_file.close();
-        game_status = 1;
+        game_status = GS_t::game;
         in_game();
     }
 
-    if (game_status == 1 && next_player.count_ships != 0) {
+    if (game_status == GS_t::game && next_player.count_ships != 0) {
         in_game();
     }
 
-    if (game_status == 1 && next_player.count_ships <= 0) {
-        game_status = 2;
+    if (game_status == GS_t::game && next_player.count_ships <= 0) {
+        game_status = GS_t::end;
         end_game();
     }
 }
@@ -184,26 +183,27 @@ void Game::type_placement_ships() {
     }
 }
 
-void Game::log(string shoot_cell, int status_attack) {
+void Game::log(string shoot_cell, StatusAttack status_attack) {
     ofstream log_file;
     log_file.open("log_file.txt", ios_base::app);
-    if (status_attack == 0 || status_attack == 1 ||
-        status_attack == 2 && log_file.is_open()) {
-        log_file << setw(20) <<current_player.name<<'\t' << setw(3) << shoot_cell<<'\t' << setw(20)
+    if (status_attack == SA_t::miss || status_attack == SA_t::damage ||
+        status_attack == SA_t::destroy && log_file.is_open()) {
+        log_file << setw(20) << current_player.name << '\t' << setw(3)
+            << shoot_cell << '\t' << setw(20)
             << description_status_attack(status_attack) << "\n";
     }
     log_file.close();
 }
 
-string Game::description_status_attack(int status_attack) {
+string Game::description_status_attack(StatusAttack status_attack) {
     switch (status_attack) {
-    case 0:
+    case SA_t::miss:
         return "Мимо";
-    case 1:
+    case SA_t::damage:
         return "Корабль подбит";
-    case 2:
+    case SA_t::destroy:
         return "Корабль уничтожен";
-    case 3:
+    case SA_t::already_use:
         return "Выстрел по таким координатам уже был";
     default:
         return string();

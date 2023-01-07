@@ -1,7 +1,11 @@
 ﻿#pragma once
 #include <iostream>
 
+#include "EnumClasses.h"
 #include "Field.h"
+
+using CSt_t = CellStatus;
+using SA_t = StatusAttack;
 
 using namespace std;
 
@@ -14,15 +18,10 @@ public:
     bool is_bot;
     bool helper;
 
-    int count_ships = 10;
+    int count_ships;
 
     Field map;
     Field radar;
 
-    // типы атаки
-    // 0 - мимо
-    // 1 - ранил
-    // 2 - убил
-    // 3 - уже использована
-    int attack(Player& player_for_attack, coordinate coords);
+    StatusAttack attack(Player& player_for_attack, coordinate coords);
 };

@@ -3,18 +3,17 @@
 #include <iostream>
 #include <string>
 
+#include "EnumClasses.h"
 #include "Field.h"
 #include "Player.h"
+using GS_t = GameStatus;
+using SA_t = StatusAttack;
 
 using namespace std;
 
 class Game {
 private:
-    // Статусы игры
-    // 0 - подготовка
-    // 1 - игра
-    // 2 - конец игры
-    int game_status;
+    GameStatus game_status;
     Player current_player;
     Player next_player;
 
@@ -32,10 +31,10 @@ public:
     // определение типа расстановки кораблей и сама расстановка
     void type_placement_ships();
 
-    void log(string shoot_cell, int status_attack);
+    void log(string shoot_cell, StatusAttack status_attack);
 
     // возвращает описание атаки
-    string description_status_attack(int status_atack);
+    string description_status_attack(StatusAttack status_attack);
 
     // возвращает ход основываясь на весе поля
     coordinate get_helper_coord();
