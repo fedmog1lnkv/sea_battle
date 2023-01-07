@@ -7,20 +7,22 @@ using namespace std;
 
 class Player {
 public:
+    Player();
+
     string name;
 
-    bool is_bot = false;
+    bool is_bot;
+    bool helper;
 
     int count_ships = 10;
 
     Field map;
     Field radar;
 
-    Player() = default;
-
+    // типы атаки
     // 0 - мимо
     // 1 - ранил
     // 2 - убил
     // 3 - уже использована
-    int attack(Player& player_for_attack, string coords);
+    int attack(Player& player_for_attack, coordinate coords);
 };

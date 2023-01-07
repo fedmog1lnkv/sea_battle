@@ -6,10 +6,19 @@ using namespace std;
 
 class Cell {
 public:
+    Cell();
 
-    enum class Status { empty_cell = 0, ship_cell = 1, damaged_ship = 2, destroyed_ship = 3, miss_cell = 4};
+    enum class Status {
+        empty_cell = 0,
+        ship_cell = 1,
+        damaged_ship = 2,
+        destroyed_ship = 3,
+        miss_cell = 4
+    };
 
     Status status;
+
+    int weight = 1;
 
     string empty_cell = "∟ ";      // 0
     string ship_cell = "■ ";       // 1
@@ -17,12 +26,10 @@ public:
     string destroyed_ship = "X ";  // 3
     string miss_cell = "• ";       // 4
 
-    Cell();
-
-
+    
+    // проверка пустая клетка или нет
     bool is_busy();
 
-    // string get_cell_image();
 
     friend ostream& operator<<(ostream& out, const Cell& status_cell);
 };
