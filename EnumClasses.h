@@ -1,6 +1,6 @@
 #pragma once
 
-// статусы ячейкт
+// статусы ячейки
 enum class CellStatus {
     empty_cell = 0,    // 0 - пустая клетка
     ship_cell = 1,     // 1 - клетка с кораблём

@@ -115,8 +115,10 @@ void Game::in_game() {
 
 void Game::end_game() {
     system("cls");
-    cout << current_player.name << " выиграл!" << endl;
+    cout << current_player.name << " выиграл!\n" << endl;
+    cout << "ПОЛЕ " << current_player.name << endl;
     current_player.map.show_field();
+    cout << "\nПОЛЕ " << next_player.name << endl;
     next_player.map.show_field();
     return;
 }

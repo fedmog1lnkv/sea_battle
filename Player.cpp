@@ -13,8 +13,9 @@ StatusAttack Player::attack(Player& player_for_attack, coordinate coords) {
         this->radar.change_cell_radar(coords, CSt_t::damaged_ship);
         break;
     case SA_t::destroy:
-        this->radar.mark_destroyed_ship_radar(coords.x, coords.y);
+        this->radar.mark_destroyed_ship_radar(coords);
         player_for_attack.count_ships--;
+        this->radar.recalculate_weight_board();
     default:
         break;
     }

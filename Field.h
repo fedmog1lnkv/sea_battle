@@ -57,11 +57,10 @@ public:
     // расстановки кораблей
     void placement_ships();
     void auto_placement_ships();
-    void put_ship(int first_x, int first_y, int second_x, int second_y);
+    void put_ship(coordinate first, coordinate second);
 
     // проверка можно ли поставить корабль по заданным координатам
-    bool check_ship_placement(int first_x, int first_y, int second_x,
-        int second_y, int type_ship, bool is_player);
+    bool check_ship_placement(coordinate first, coordinate second, int type_ship, bool is_player);
 
     // возвращает статус атаки
     StatusAttack make_attack(coordinate coords);
@@ -70,7 +69,7 @@ public:
     int injure_ship(coordinate coord_ship);
 
     // отмечает на радаре уничтоженный корабль
-    void mark_destroyed_ship_radar(int x_coord, int y_coord);
+    void mark_destroyed_ship_radar(coordinate coord);
 
     // меняет на радаре статус клетки
     void change_cell_radar(coordinate coords, CSt_t new_status);

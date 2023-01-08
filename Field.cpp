@@ -45,7 +45,6 @@ bool Field::check_area(int x, int y) {
 
 void Field::placement_ships() {
     cout << "Расставьте корабли" << endl;
-    cout << "Координаты носа : Координаты кормы" << endl;
 
     string coords, bow, stern;
     for (int i = 9; i > -1; i--) {
@@ -60,7 +59,6 @@ void Field::placement_ships() {
 
             // верхний регистр
             transform(coords.begin(), coords.end(), coords.begin(), ::toupper);
-            int first_x, first_y, second_x, second_y;
 
             // расстановка однопалубного
             if (type_ships[i] == 1) {
@@ -88,52 +86,44 @@ void Field::placement_ships() {
                 }
             }
 
-            coordinate first_coords = get_coords_x_y(bow);
-            coordinate second_coords = get_coords_x_y(stern);
-
-            first_x = first_coords.x;
-            first_y = first_coords.y;
-            second_x = second_coords.x;
-            second_y = second_coords.y;
+            coordinate first_coord = get_coords_x_y(bow);
+            coordinate second_coord = get_coords_x_y(stern);
 
             // сортировка координат, т.к. всегда две координаты должны быть
             // одинаковые
-            if (first_x == second_x) {
-                if (first_y > second_y) {
-                    swap(first_y, second_y);
+            if (first_coord.x == second_coord.x) {
+                if (first_coord.y > second_coord.y) {
+                    swap(first_coord, second_coord);
                 }
             }
             else {
-                if (first_y == second_y) {
-                    if (first_x > second_x) {
-                        swap(first_x, second_x);
+                if (first_coord.y == second_coord.y) {
+                    if (first_coord.x > second_coord.x) {
+                        swap(first_coord.x, second_coord.x);
                     }
                 }
             }
 
-            if (check_ship_placement(first_x, first_y, second_x, second_y,
-                type_ships[i], true)) {
-                coordinate start_coords;
-                start_coords.x = first_x;
-                start_coords.y = first_y;
+            if (check_ship_placement(first_coord, second_coord, type_ships[i],
+                true)) {
                 int rotate;
-                if (first_x == second_x) {
+                if (first_coord.x == second_coord.x) {
                     rotate = 0;
                 }
                 else {
                     rotate = 1;
                 }
-                ships[i] = Ship(start_coords, rotate, type_ships[i]);
-                put_ship(first_x, first_y, second_x, second_y);
+                ships[i] = Ship(first_coord, rotate, type_ships[i]);
+                put_ship(first_coord, second_coord);
                 break;
             }
         }
     }
 }
 
-bool Field::check_ship_placement(int first_x, int first_y, int second_x,
-    int second_y, int type_ship, bool is_player) {
-    if (check_area(first_x, first_y) || check_area(second_x, second_y)) {
+bool Field::check_ship_placement(coordinate first, coordinate second,
+    int type_ship, bool is_player) {
+    if (check_area(first.x, first.y) || check_area(second.x, second.y)) {
         if (is_player == true) {
             cout << "Вернитесь в зону боевых действий" << endl;
             Sleep(1000);
@@ -142,8 +132,8 @@ bool Field::check_ship_placement(int first_x, int first_y, int second_x,
     }
 
     int lenght_ship =
-        static_cast<int>(sqrt(pow(second_x + 1 - first_x + 1, 2) +
-            pow(second_y + 1 - first_y + 1, 2)) -
+        static_cast<int>(sqrt(pow(second.x + 1 - first.x + 1, 2) +
+            pow(second.y + 1 - first.y + 1, 2)) -
             1);
 
     if (lenght_ship != type_ship) {
@@ -154,7 +144,7 @@ bool Field::check_ship_placement(int first_x, int first_y, int second_x,
         return false;
     }
 
-    if (first_x != second_x && first_y != second_y) {
+    if (first.x != second.x && first.y != second.y) {
         if (is_player == true) {
             cout << "Неверные координаты расстановки" << endl;
             Sleep(1000);
@@ -163,8 +153,8 @@ bool Field::check_ship_placement(int first_x, int first_y, int second_x,
     }
 
     // пробежка по координатам вокруг
-    for (int x = first_x - 1; x <= second_x + 1; x++) {
-        for (int y = first_y - 1; y <= second_y + 1; y++) {
+    for (int x = first.x - 1; x <= second.x + 1; x++) {
+        for (int y = first.y - 1; y <= second.y + 1; y++) {
             // проверка выхода из поля
             if (check_area(x, y)) {
                 continue;
@@ -183,7 +173,7 @@ bool Field::check_ship_placement(int first_x, int first_y, int second_x,
 
 void Field::auto_placement_ships() {
     for (int i = 9; i > -1; i--) {
-        int first_x, first_y, second_x, second_y;
+        coordinate first_coord, second_coord;
 
         while (true) {
             // 0 - вертикаль
@@ -193,26 +183,20 @@ void Field::auto_placement_ships() {
             int rand_start_coords_x = (rand() % 10);
             int rand_start_coords_y = (rand() % 10);
 
+            first_coord = { rand_start_coords_x, rand_start_coords_y };
             if (rand_rotate == 0) {
-                first_x = rand_start_coords_x;
-                first_y = rand_start_coords_y;
-                second_x = rand_start_coords_x;
-                second_y = rand_start_coords_y + type_ships[i] - 1;
+                second_coord = { rand_start_coords_x,
+                                rand_start_coords_y + type_ships[i] - 1 };
             }
             else {
-                first_x = rand_start_coords_x;
-                first_y = rand_start_coords_y;
-                second_x = rand_start_coords_x + type_ships[i] - 1;
-                second_y = rand_start_coords_y;
+                second_coord = { rand_start_coords_x + type_ships[i] - 1,
+                                rand_start_coords_y };
             }
 
-            if (check_ship_placement(first_x, first_y, second_x, second_y,
-                type_ships[i], false)) {
-                coordinate start_coords;
-                start_coords.x = rand_start_coords_x;
-                start_coords.y = rand_start_coords_y;
-                ships[i] = Ship(start_coords, rand_rotate, type_ships[i]);
-                put_ship(first_x, first_y, second_x, second_y);
+            if (check_ship_placement(first_coord, second_coord, type_ships[i],
+                false)) {
+                ships[i] = Ship(first_coord, rand_rotate, type_ships[i]);
+                put_ship(first_coord, second_coord);
 
                 break;
             }
@@ -220,21 +204,20 @@ void Field::auto_placement_ships() {
     }
 }
 
-void Field::put_ship(int first_x, int first_y, int second_x, int second_y) {
-    for (int x = first_x; x <= second_x; x++) {
-        for (int y = first_y; y <= second_y; y++) {
+void Field::put_ship(coordinate first, coordinate second) {
+    for (int x = first.x; x <= second.x; x++) {
+        for (int y = first.y; y <= second.y; y++) {
             board[y][x].status = CSt_t::ship_cell;
             board[y][x].weight = 7;
         }
     }
 }
 
-void Field::mark_destroyed_ship_radar(int x_coord, int y_coord) {
-    board[y_coord][x_coord].status = CSt_t::destroyed_ship;
-    for (int x = x_coord - 1; x <= x_coord + 1; x++) {
-        for (int y = y_coord - 1; y <= y_coord + 1; y++) {
-            if (x < 0 || x > 9 || y < 0 || y > 9 ||
-                (x == x_coord && y == y_coord)) {
+void Field::mark_destroyed_ship_radar(coordinate coord) {
+    board[coord.y][coord.x].status = CSt_t::destroyed_ship;
+    for (int x = coord.x - 1; x <= coord.x + 1; x++) {
+        for (int y = coord.y - 1; y <= coord.y + 1; y++) {
+            if (check_area(x, y) || (x == coord.x && y == coord.y)) {
                 continue;
             }
             if (board[y][x].status == CSt_t::empty_cell) {
@@ -242,11 +225,10 @@ void Field::mark_destroyed_ship_radar(int x_coord, int y_coord) {
             }
             if (board[y][x].status == CSt_t::damaged_ship) {
                 board[y][x].status = CSt_t::destroyed_ship;
-                mark_destroyed_ship_radar(x, y);
+                mark_destroyed_ship_radar({ x, y });
             }
         }
     }
-    recalculate_weight_board();
 }
 
 StatusAttack Field::make_attack(coordinate coords) {
@@ -276,7 +258,7 @@ StatusAttack Field::make_attack(coordinate coords) {
         }
         // убил
         else {
-            mark_destroyed_ship_radar(coords.x, coords.y);
+            mark_destroyed_ship_radar(coords);
             return SA_t::destroy;
         }
     }
@@ -363,9 +345,9 @@ void Field::recalculate_weight_board() {
                     board[y][x].weight = 0;
                     continue;
                 }
-                if (check_ship_placement(x, y, x + ships[ship].type_ship, y,
+                if (check_ship_placement({x, y}, {x + ships[ship].type_ship, y},
                                          ships[ship].type_ship, false) ||
-                    check_ship_placement(x, y, x, y + ships[ship].type_ship,
+                    check_ship_placement({x, y}, {x, y + ships[ship].type_ship},
                                          ships[ship].type_ship, false)) {
                     board[y][x].weight++;
                 }
