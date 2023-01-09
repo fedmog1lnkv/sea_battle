@@ -45,8 +45,6 @@ void Game::startPreparation() {
         Sleep(500);
     }
 
-    current_player.is_bot = true;
-
     cout << "Первый ходит: " << current_player.name << endl;
     Sleep(2000);
 
@@ -73,7 +71,7 @@ void Game::inGame() {
         }
         cout << "Бот атакует: " << hint_move << endl;
         cout << getDescriptionStatusAttack(status_attack) << endl;
-        //system("pause");
+        system("pause");
     }
 
     else {
@@ -129,8 +127,15 @@ void Game::endGame() {
 void Game::statusSwitch() {
     if (game_status == GS_t::preparation) {
         ofstream log_file("log_file.txt");
-        log_file << "Лог игры\n";
+
+        log_file << "Лог игры\n\nРасстановка кораблей игрока "<<current_player.name<<endl;
+        current_player.map.dumpFieldLog(log_file);
+        log_file << "\nРасстановка кораблей игрока " << next_player.name << endl;
+        next_player.map.dumpFieldLog(log_file);      
+        log_file << "\nАтаки\n";
+
         log_file.close();
+
         game_status = GS_t::game;
         inGame();
     }
@@ -193,7 +198,7 @@ void Game::log(const string& shoot_cell, StatusAttack status_attack) {
     log_file.open("log_file.txt", ios_base::app);
     if (status_attack == SA_t::miss || status_attack == SA_t::damage ||
         status_attack == SA_t::destroy && log_file.is_open()) {
-        log_file << setw(20) << current_player.name << '\t' << setw(3)
+        log_file << setw(10) << current_player.name << '\t' << setw(3)
             << shoot_cell << '\t' << setw(20)
             << getDescriptionStatusAttack(status_attack) << "\n";
     }
