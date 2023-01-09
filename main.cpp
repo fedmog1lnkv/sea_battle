@@ -13,11 +13,7 @@ int main() {
     srand(static_cast<int>(time(0)));
 
     Game game;
-    game.start_preparation();
-
-    // игра между двумя ботами
-    // 1 игра = 3 секунды
-    // для 100 игр = 335,1 секунды
+    game.startPreparation();
 
     return 0;
 }

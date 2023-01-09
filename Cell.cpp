@@ -2,7 +2,7 @@
 
 Cell::Cell() : status(CSt_t::empty_cell), weight(1) {}
 
-bool Cell::is_busy() { return status != CSt_t::empty_cell; }
+bool Cell::isBusy() { return status != CSt_t::empty_cell; }
 
 ostream& operator<<(ostream& out, const Cell& status_cell) {
     switch (status_cell.status) {
@@ -20,8 +20,6 @@ ostream& operator<<(ostream& out, const Cell& status_cell) {
         break;
     case CSt_t::miss_cell:
         out << status_cell.miss_cell;
-        break;
-    default:
         break;
     }
     return out;

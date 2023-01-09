@@ -2,18 +2,18 @@
 
 #include "Field.h"
 
-Field::Field() { fill_map(); }
+Field::Field() { fillMap(); }
 
 #define FOR_MAP                  \
     for (int y = 0; y < 10; y++) \
         for (int x = 0; x < 10; x++)
 
-void Field::fill_map() {
+void Field::fillMap() {
     FOR_MAP
         board[y][x] = Cell();
 }
 
-void Field::delete_ship(int type_ship) {
+void Field::deleteShip(int type_ship) {
     for (int ship = 0; ship < 10; ship++) {
         if (type_ships[ship] == type_ship) {
             type_ships[ship] = 0;
@@ -22,7 +22,7 @@ void Field::delete_ship(int type_ship) {
     }
 }
 
-coordinate Field::get_coords_x_y(string coords) {
+coordinate Field::getCoordsXY(string coords) {
     transform(coords.begin(), coords.end(), coords.begin(), ::toupper);
     coordinate point;
 
@@ -32,25 +32,25 @@ coordinate Field::get_coords_x_y(string coords) {
     return point;
 }
 
-string Field::get_coords_string(coordinate cell) {
+string Field::getCoordsString(coordinate cell) {
     string hint_move;
     hint_move.push_back(letters[cell.x]);
     hint_move += to_string(cell.y + 1);
     return hint_move;
 }
 
-bool Field::check_area(int x, int y) {
+bool Field::checkArea(int x, int y) {
     return (x < 0 || x > 9 || y < 0 || y > 9);
 }
 
-void Field::placement_ships() {
+void Field::placementShips() {
     cout << "Расставьте корабли" << endl;
 
     string coords, bow, stern;
     for (int i = 9; i > -1; i--) {
         system("cls");
 
-        show_field();
+        showField();
 
         cout << "Куда поставить " << name_ships[type_ships[i] - 1] << "?"
             << endl;
@@ -86,8 +86,8 @@ void Field::placement_ships() {
                 }
             }
 
-            coordinate first_coord = get_coords_x_y(bow);
-            coordinate second_coord = get_coords_x_y(stern);
+            coordinate first_coord = getCoordsXY(bow);
+            coordinate second_coord = getCoordsXY(stern);
 
             // сортировка координат, т.к. всегда две координаты должны быть
             // одинаковые
@@ -104,7 +104,7 @@ void Field::placement_ships() {
                 }
             }
 
-            if (check_ship_placement(first_coord, second_coord, type_ships[i],
+            if (checkShipPlacement(first_coord, second_coord, type_ships[i],
                 true)) {
                 int rotate;
                 if (first_coord.x == second_coord.x) {
@@ -114,16 +114,16 @@ void Field::placement_ships() {
                     rotate = 1;
                 }
                 ships[i] = Ship(first_coord, rotate, type_ships[i]);
-                put_ship(first_coord, second_coord);
+                putShip(first_coord, second_coord);
                 break;
             }
         }
     }
 }
 
-bool Field::check_ship_placement(coordinate first, coordinate second,
+bool Field::checkShipPlacement(coordinate first, coordinate second,
     int type_ship, bool is_player) {
-    if (check_area(first.x, first.y) || check_area(second.x, second.y)) {
+    if (checkArea(first.x, first.y) || checkArea(second.x, second.y)) {
         if (is_player == true) {
             cout << "Вернитесь в зону боевых действий" << endl;
             Sleep(1000);
@@ -156,10 +156,10 @@ bool Field::check_ship_placement(coordinate first, coordinate second,
     for (int x = first.x - 1; x <= second.x + 1; x++) {
         for (int y = first.y - 1; y <= second.y + 1; y++) {
             // проверка выхода из поля
-            if (check_area(x, y)) {
+            if (checkArea(x, y)) {
                 continue;
             }
-            if (board[y][x].is_busy()) {
+            if (board[y][x].isBusy()) {
                 if (is_player == true) {
                     cout << "Рядом стоит другой корабль" << endl;
                     Sleep(1000);
@@ -171,7 +171,7 @@ bool Field::check_ship_placement(coordinate first, coordinate second,
     return true;
 }
 
-void Field::auto_placement_ships() {
+void Field::autoPlacementShips() {
     for (int i = 9; i > -1; i--) {
         coordinate first_coord, second_coord;
 
@@ -193,10 +193,10 @@ void Field::auto_placement_ships() {
                                 rand_start_coords_y };
             }
 
-            if (check_ship_placement(first_coord, second_coord, type_ships[i],
+            if (checkShipPlacement(first_coord, second_coord, type_ships[i],
                 false)) {
                 ships[i] = Ship(first_coord, rand_rotate, type_ships[i]);
-                put_ship(first_coord, second_coord);
+                putShip(first_coord, second_coord);
 
                 break;
             }
@@ -204,7 +204,7 @@ void Field::auto_placement_ships() {
     }
 }
 
-void Field::put_ship(coordinate first, coordinate second) {
+void Field::putShip(coordinate first, coordinate second) {
     for (int x = first.x; x <= second.x; x++) {
         for (int y = first.y; y <= second.y; y++) {
             board[y][x].status = CSt_t::ship_cell;
@@ -213,11 +213,11 @@ void Field::put_ship(coordinate first, coordinate second) {
     }
 }
 
-void Field::mark_destroyed_ship_radar(coordinate coord) {
+void Field::markDestroyedShipRadar(coordinate coord) {
     board[coord.y][coord.x].status = CSt_t::destroyed_ship;
     for (int x = coord.x - 1; x <= coord.x + 1; x++) {
         for (int y = coord.y - 1; y <= coord.y + 1; y++) {
-            if (check_area(x, y) || (x == coord.x && y == coord.y)) {
+            if (checkArea(x, y) || (x == coord.x && y == coord.y)) {
                 continue;
             }
             if (board[y][x].status == CSt_t::empty_cell) {
@@ -225,13 +225,13 @@ void Field::mark_destroyed_ship_radar(coordinate coord) {
             }
             if (board[y][x].status == CSt_t::damaged_ship) {
                 board[y][x].status = CSt_t::destroyed_ship;
-                mark_destroyed_ship_radar({ x, y });
+                markDestroyedShipRadar({ x, y });
             }
         }
     }
 }
 
-StatusAttack Field::make_attack(coordinate coords) {
+StatusAttack Field::makeAttack(coordinate coords) {
     if (coords.x == -1 || coords.y == -1) {
         return SA_t::error;
     }
@@ -251,27 +251,27 @@ StatusAttack Field::make_attack(coordinate coords) {
 
     // если в клеточке корабль
     if (board[coords.y][coords.x].status == CSt_t::ship_cell) {
-        int hp = injure_ship(coords);
+        int hp = injureShip(coords);
         if (hp > 0) {
             board[coords.y][coords.x].status = CSt_t::damaged_ship;
             return SA_t::damage;
         }
         // убил
         else {
-            mark_destroyed_ship_radar(coords);
+            markDestroyedShipRadar(coords);
             return SA_t::destroy;
         }
     }
     return SA_t::error;
 }
 
-int Field::injure_ship(coordinate coord_attack_ship) {
-    Ship& attacked_ship = find_ship(coord_attack_ship);
+int Field::injureShip(coordinate coord_attack_ship) {
+    Ship& attacked_ship = findShip(coord_attack_ship);
     attacked_ship.hp--;
     return attacked_ship.hp;
 }
 
-Ship& Field::find_ship(coordinate coord_cell) {
+Ship& Field::findShip(coordinate coord_cell) {
     for (int ship = 0; ship < 10; ship++) {
         for (int lenght_ship = 0; lenght_ship <= ships[ship].type_ship;
             lenght_ship++) {
@@ -293,12 +293,12 @@ Ship& Field::find_ship(coordinate coord_cell) {
     }
 }
 
-void Field::change_cell_radar(coordinate coords, CSt_t new_status) {
+void Field::changeCellRadar(coordinate coords, CSt_t new_status) {
     board[coords.y][coords.x].status = new_status;
-    recalculate_weight_board();
+    recalculateWeightBoard();
 }
 
-void Field::recalculate_weight_board() {
+void Field::recalculateWeightBoard() {
     FOR_MAP
         board[y][x].weight = 1;
 
@@ -345,9 +345,9 @@ void Field::recalculate_weight_board() {
                     board[y][x].weight = 0;
                     continue;
                 }
-                if (check_ship_placement({x, y}, {x + ships[ship].type_ship, y},
+                if (checkShipPlacement({x, y}, {x + ships[ship].type_ship, y},
                                          ships[ship].type_ship, false) ||
-                    check_ship_placement({x, y}, {x, y + ships[ship].type_ship},
+                    checkShipPlacement({x, y}, {x, y + ships[ship].type_ship},
                                          ships[ship].type_ship, false)) {
                     board[y][x].weight++;
                 }
@@ -356,7 +356,7 @@ void Field::recalculate_weight_board() {
     }
 }
 
-coordinate Field::get_coord_max_weight_cell() {
+coordinate Field::getCoordMaxWeightCell() {
     map<int, coordinate> weights_cells;
     int max_weight = 0;
 
@@ -368,7 +368,7 @@ coordinate Field::get_coord_max_weight_cell() {
 
     if (max_weight == 1) {
         coordinate temp_coord = { rand() % 10, rand() % 10 };
-        while (board[temp_coord.y][temp_coord.x].is_busy()) {
+        while (board[temp_coord.y][temp_coord.x].isBusy()) {
             temp_coord = { rand() % 10, rand() % 10 };
         }
 
@@ -383,7 +383,7 @@ coordinate Field::get_coord_max_weight_cell() {
     return { rand() % 10, rand() % 10 };
 }
 
-void Field::show_field() {
+void Field::showField() {
     cout << setw(3) << " ";
     for (int i = 0; i < letters.size(); i++) {
         cout << setw(1) << letters[i] << " ";

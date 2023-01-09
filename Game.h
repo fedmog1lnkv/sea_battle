@@ -22,20 +22,20 @@ private:
 public:
     Game();
 
-    void start_preparation();
-    void in_game();
-    void end_game();
+    void startPreparation();
+    void inGame();
+    void endGame();
 
-    void status_switch();
+    void statusSwitch();
 
     // определение типа расстановки кораблей и сама расстановка
-    void type_placement_ships();
+    void typePlacementShips();
 
-    void log(string shoot_cell, StatusAttack status_attack);
+    void log(const string& shoot_cell, StatusAttack status_attack);
 
     // возвращает описание атаки
-    string description_status_attack(StatusAttack status_attack);
+    string getDescriptionStatusAttack(StatusAttack status_attack);
 
     // возвращает ход основываясь на весе поля
-    coordinate get_helper_coord();
+    coordinate getHelperCoord();
 };

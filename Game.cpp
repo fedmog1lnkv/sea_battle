@@ -3,7 +3,7 @@
 
 Game::Game() : game_status(GS_t::preparation) {}
 
-void Game::start_preparation() {
+void Game::startPreparation() {
     system("cls");
 
     string name_player1, name_player2;
@@ -21,7 +21,7 @@ void Game::start_preparation() {
         cout << "Имена игроков одинаковые\n		Перезагрузка..."
             << endl;
         Sleep(1500);
-        start_preparation();
+        startPreparation();
         return;
     }
 
@@ -45,22 +45,24 @@ void Game::start_preparation() {
         Sleep(500);
     }
 
+    current_player.is_bot = true;
+
     cout << "Первый ходит: " << current_player.name << endl;
     Sleep(2000);
 
-    type_placement_ships();
+    typePlacementShips();
 
-    status_switch();
+    statusSwitch();
 
     return;
 }
 
-void Game::in_game() {
+void Game::inGame() {
     system("cls");
     if (current_player.is_bot == true) {
         coordinate attack_cell =
-            current_player.radar.get_coord_max_weight_cell();
-        string hint_move = current_player.map.get_coords_string(attack_cell);
+            current_player.radar.getCoordMaxWeightCell();
+        string hint_move = current_player.map.getCoordsString(attack_cell);
 
         StatusAttack status_attack =
             current_player.attack(next_player, attack_cell);
@@ -70,22 +72,23 @@ void Game::in_game() {
             swap(current_player, next_player);
         }
         cout << "Бот атакует: " << hint_move << endl;
-        cout << description_status_attack(status_attack) << endl;
-        system("pause");
+        cout << getDescriptionStatusAttack(status_attack) << endl;
+        //system("pause");
     }
+
     else {
         cout << "\nРАДАР" << endl;
-        current_player.radar.show_field();
+        current_player.radar.showField();
         cout << "\nКАРТА" << endl;
-        current_player.map.show_field();
+        current_player.map.showField();
 
         string coords_for_attack;
 
         if (current_player.helper == true) {
             coordinate attack_cell =
-                current_player.radar.get_coord_max_weight_cell();
+                current_player.radar.getCoordMaxWeightCell();
             string hint_move =
-                current_player.map.get_coords_string(attack_cell);
+                current_player.map.getCoordsString(attack_cell);
             cout << "Боцман: атакуйте " << hint_move << endl;
         }
 
@@ -93,12 +96,12 @@ void Game::in_game() {
         cin >> coords_for_attack;
 
         coordinate attack_cell =
-            current_player.map.get_coords_x_y(coords_for_attack);
+            current_player.map.getCoordsXY(coords_for_attack);
         StatusAttack status_attack =
             current_player.attack(next_player, attack_cell);
         log(coords_for_attack, status_attack);
 
-        string d_status_attack = description_status_attack(status_attack);
+        string d_status_attack = getDescriptionStatusAttack(status_attack);
         if (status_attack == SA_t::miss) {
             cout << d_status_attack << endl;
             swap(current_player, next_player);
@@ -110,39 +113,39 @@ void Game::in_game() {
         }
     }
 
-    status_switch();
+    statusSwitch();
 }
 
-void Game::end_game() {
+void Game::endGame() {
     system("cls");
     cout << current_player.name << " выиграл!\n" << endl;
     cout << "ПОЛЕ " << current_player.name << endl;
-    current_player.map.show_field();
+    current_player.map.showField();
     cout << "\nПОЛЕ " << next_player.name << endl;
-    next_player.map.show_field();
+    next_player.map.showField();
     return;
 }
 
-void Game::status_switch() {
+void Game::statusSwitch() {
     if (game_status == GS_t::preparation) {
         ofstream log_file("log_file.txt");
         log_file << "Лог игры\n";
         log_file.close();
         game_status = GS_t::game;
-        in_game();
+        inGame();
     }
 
     if (game_status == GS_t::game && next_player.count_ships != 0) {
-        in_game();
+        inGame();
     }
 
     if (game_status == GS_t::game && next_player.count_ships <= 0) {
         game_status = GS_t::end;
-        end_game();
+        endGame();
     }
 }
 
-void Game::type_placement_ships() {
+void Game::typePlacementShips() {
     int type_placement;
     system("cls");
     cout << current_player.name
@@ -150,10 +153,10 @@ void Game::type_placement_ships() {
         << endl;
     cin >> type_placement;
     if (type_placement == 1) {
-        current_player.map.placement_ships();
+        current_player.map.placementShips();
     }
     else {
-        current_player.map.auto_placement_ships();
+        current_player.map.autoPlacementShips();
     }
 
     int on_helper;
@@ -164,7 +167,7 @@ void Game::type_placement_ships() {
     }
 
     if (next_player.is_bot == true) {
-        next_player.map.auto_placement_ships();
+        next_player.map.autoPlacementShips();
         return;
     }
     system("cls");
@@ -172,10 +175,10 @@ void Game::type_placement_ships() {
     cout << "Как разместить корабли?\n[1] в ручную\n[2] автоматически" << endl;
     cin >> type_placement;
     if (type_placement == 1) {
-        next_player.map.placement_ships();
+        next_player.map.placementShips();
     }
     else {
-        next_player.map.auto_placement_ships();
+        next_player.map.autoPlacementShips();
     }
     cout << "Включить помощника?\n[1] да\n[2] нет" << endl;
     cin >> on_helper;
@@ -185,19 +188,19 @@ void Game::type_placement_ships() {
     }
 }
 
-void Game::log(string shoot_cell, StatusAttack status_attack) {
+void Game::log(const string& shoot_cell, StatusAttack status_attack) {
     ofstream log_file;
     log_file.open("log_file.txt", ios_base::app);
     if (status_attack == SA_t::miss || status_attack == SA_t::damage ||
         status_attack == SA_t::destroy && log_file.is_open()) {
         log_file << setw(20) << current_player.name << '\t' << setw(3)
             << shoot_cell << '\t' << setw(20)
-            << description_status_attack(status_attack) << "\n";
+            << getDescriptionStatusAttack(status_attack) << "\n";
     }
     log_file.close();
 }
 
-string Game::description_status_attack(StatusAttack status_attack) {
+string Game::getDescriptionStatusAttack(StatusAttack status_attack) {
     switch (status_attack) {
     case SA_t::miss:
         return "Мимо";
@@ -207,13 +210,11 @@ string Game::description_status_attack(StatusAttack status_attack) {
         return "Корабль уничтожен";
     case SA_t::already_use:
         return "Выстрел по таким координатам уже был";
-    default:
-        return string();
     }
 }
 
-coordinate Game::get_helper_coord() {
+coordinate Game::getHelperCoord() {
     coordinate attack_cell;
-    attack_cell = current_player.radar.get_coord_max_weight_cell();
+    attack_cell = current_player.radar.getCoordMaxWeightCell();
     return attack_cell;
 }

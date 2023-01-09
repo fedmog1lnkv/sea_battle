@@ -22,7 +22,7 @@ public:
     string miss_cell = "• ";
 
     // проверка пустая клетка или нет
-    bool is_busy();
+    bool isBusy();
 
     friend ostream& operator<<(ostream& out, const Cell& status_cell);
 };
